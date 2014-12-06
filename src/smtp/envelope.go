@@ -32,7 +32,7 @@ func purgeMsg(fn string, ss *Settings) {
 		err = os.Remove(fn)
 	}
 	if err != nil {
-		ss.Log("RUNERR: " + err.Error())
+		ss.Error("RUNERR: " + err.Error())
 	}
 }
 
@@ -41,7 +41,7 @@ func loadEnvelope(file string, ss *Settings) *envelope {
 	var env envelope
 	defer func() {
 		if err != nil {
-			ss.Log("RUNERR: " + err.Error())
+			ss.Error("RUNERR: " + err.Error())
 		}
 	}()
 	p := strings.Split(file, "@")
@@ -89,7 +89,7 @@ func loadEnvelope(file string, ss *Settings) *envelope {
 
 func (e *envelope) recErr(rcpt string, msg string, fatal bool) {
 	if fatal {
-		e.Logf("RUNERR: " + msg)
+		e.Errorf("RUNERR: " + msg)
 		e.errors[rcpt] = "!" + msg
 	} else {
 		e.Debugf("RUNERR: " + msg)
@@ -150,10 +150,10 @@ func (e *envelope) flush(final bool) {
 				purgeMsg(e.file, e.Settings)
 				e.file = newfile
 			} else {
-				e.Log("RUNERR: " + err.Error())
+				e.Error("RUNERR: " + err.Error())
 			}
 		} else {
-			e.Log("RUNERR: " + err.Error())
+			e.Error("RUNERR: " + err.Error())
 		}
 	} else {
 		e.Debug("No more recipients, removing: " + path.Base(e.file))
@@ -175,7 +175,7 @@ func (e envelope) bounce(failed []string, errmsg string) {
 	efn := path + "@" + s[len(s)-1] + "@0.env"
 	defer func() {
 		if err != nil {
-			e.Log("RUNERR: " + err.Error())
+			e.Error("RUNERR: " + err.Error())
 			purgeMsg(mfn, e.Settings)
 			purgeMsg(efn, e.Settings)
 		}

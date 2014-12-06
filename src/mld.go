@@ -39,7 +39,7 @@ func main() {
 		panic(err)
 	}
 	ln.SetDeadline(time.Now().Add(1 * time.Minute))
-	environ.Log(environ.Dump())
+	environ.Info(environ.Dump())
 	fmt.Println(environ.Dump())
 	for {
 		go smtp.SendMails(environ.Spool+"/outbound", environ)
@@ -47,7 +47,7 @@ func main() {
 		if err != nil {
 			if opErr, ok := err.(*net.OpError); ok && opErr.Temporary() {
 				if !opErr.Timeout() {
-					environ.Log("RUNERR: " + opErr.Error())
+					environ.Info("RUNERR: " + opErr.Error())
 				}
 				ln.SetDeadline(time.Now().Add(1 * time.Minute))
 				continue
@@ -81,7 +81,7 @@ func main() {
 			}()
 			err = s.Serve()
 			if err != nil {
-				environ.Logf("%s: ERROR! %s", s.CliAddr(), err.Error())
+				environ.Errorf("%s: ERROR! %s", s.CliAddr(), err.Error())
 			}
 		}(environ)
 	}

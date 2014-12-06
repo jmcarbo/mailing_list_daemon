@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log4g"
+  log "github.com/Sirupsen/logrus"
 	"net"
 	"strings"
 	"time"
@@ -13,7 +13,7 @@ import (
 type cliSession struct {
 	server string
 	reader *bufio.Reader
-	lg     log4g.Logger
+	lg     *log.Logger
 	net.Conn
 }
 
@@ -69,7 +69,7 @@ func NewCliSession(server string, env *envelope) (*cliSession, error) {
 	cs := &cliSession{
 		server,
 		bufio.NewReader(conn),
-		env.SysLogger,
+		log.New(),
 		conn,
 	}
 	err, _ = cs.act("", "2")

@@ -83,7 +83,7 @@ func (s svrSession) expects() (reply string) {
 func (s svrSession) expnList(ctrl map[string][]string, list []string, name string) {
 	for _, r := range list {
 		if r == name {
-			s.Log("CFGERR: Cyclic recipient name: " + r)
+			s.Error("CFGERR: Cyclic recipient name: " + r)
 		} else {
 			at := strings.Index(r, "@")
 			if at > 0 && at < len(r)-1 {
@@ -95,7 +95,7 @@ func (s svrSession) expnList(ctrl map[string][]string, list []string, name strin
 					s.Debugf("%s>   =>[%s, %d addr(s)]", s.CliAddr(), r, len(expn))
 					s.expnList(ctrl, expn, r)
 				} else {
-					s.Log("CFGERR: Unresolved recpient: " + r)
+					s.Error("CFGERR: Unresolved recpient: " + r)
 				}
 			}
 		}
@@ -179,7 +179,7 @@ func (s *svrSession) Reset(reason byte) {
 		if err == nil {
 			msgs, err := dir.Readdirnames(0)
 			if err != nil {
-				s.Log("PROC_SUBMIT_READDIR: " + err.Error())
+				s.Error("PROC_SUBMIT_READDIR: " + err.Error())
 			}
 			s.Debug("Queueing inbound messages...")
 			envs := 0
@@ -192,12 +192,12 @@ func (s *svrSession) Reset(reason byte) {
 				s.Debugf("  %s", fi[ls:])
 				err = MoveFile(fi, fo)
 				if err != nil {
-					s.Logf("PROC_SUBMIT_MOVEFILE(%s): %s", fi, err.Error())
+					s.Errorf("PROC_SUBMIT_MOVEFILE(%s): %s", fi, err.Error())
 				}
 			}
 			s.Debugf("Envelope(s) queued: %d", envs)
 		} else if !os.IsNotExist(err) {
-			s.Log("PROC_SUBMIT_OPENDIR: " + err.Error())
+			s.Error("PROC_SUBMIT_OPENDIR: " + err.Error())
 		}
 	case PROC_FLUSH:
 		os.RemoveAll(s.Spool + "/inbound/" + s.path)
@@ -270,7 +270,7 @@ func (s *svrSession) handle(cmdline []byte) string {
 				s.state = 4
 				return "354 Go ahead"
 			}
-			s.Logf("%s: ERROR! %s", s.CliAddr(), err.Error())
+			s.Errorf("%s: ERROR! %s", s.CliAddr(), err.Error())
 			s.state = 0
 			return "421 Service temporarily unavailable"
 		case "MAIL":
@@ -354,7 +354,7 @@ func (s *svrSession) Serve() error {
 		}
 		if s.state <= 0 || s.p_errs > 2 || s.r_errs > 2 {
 			if s.p_errs > 0 || s.r_errs > 0 {
-				s.Logf("%s: ERROR! P=%d, R=%d", s.CliAddr(), s.p_errs, s.r_errs)
+				s.Errorf("%s: ERROR! P=%d, R=%d", s.CliAddr(), s.p_errs, s.r_errs)
 			}
 			break
 		}

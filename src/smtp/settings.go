@@ -3,7 +3,7 @@ package smtp
 import (
 	"encoding/json"
 	"fmt"
-	"log4g"
+  log "github.com/Sirupsen/logrus"
 	"os"
 	"path"
 	"strings"
@@ -27,7 +27,7 @@ type Settings struct {
 	expire    int
 	r_int     routes //list members (allowed senders)
 	r_ext     routes //recipients opened to outside 
-	*log4g.SysLogger
+	*log.Logger
 }
 
 func (s Settings) Dump() string {
@@ -58,11 +58,8 @@ func (s *Settings) compileRoutes() {
 }
 
 func LoadSettings(filename string) (*Settings, error) {
-	ident := fmt.Sprintf("%s[%d]", path.Base(os.Args[0]), os.Getpid())
-	logger, err := log4g.NewSysLogger(ident, log4g.DEBUG_MODE)
-	if err != nil {
-		return nil, err
-	}
+	//ident := fmt.Sprintf("%s[%d]", path.Base(os.Args[0]), os.Getpid())
+	logger := log.New()
 	s := Settings{
 		"127.0.0.1",       //Bind
 		25,                //Port
@@ -82,7 +79,7 @@ func LoadSettings(filename string) (*Settings, error) {
 		logger,
 	}
 	var f *os.File
-	f, err = os.Open(filename)
+  f, err := os.Open(filename)
 	if err != nil {
 		if os.IsNotExist(err) {
 			f, err = os.Create(filename)
@@ -109,7 +106,7 @@ func LoadSettings(filename string) (*Settings, error) {
 		err = dec.Decode(&s)
 	}
 	if err == nil {
-		s.Mode(s.DebugMode)
+		//s.Mode(s.DebugMode)
 		s.Spool = path.Clean(s.Spool)
 		err = os.MkdirAll(s.Spool+"/inbound", 0755)
 		if err == nil {

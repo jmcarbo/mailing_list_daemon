@@ -129,7 +129,7 @@ func SendMails(spool string, ss *Settings) {
 						go sendMail(f, ss)
 					}
 				} else {
-					ss.Logf("RUNERR: invalid envelope: %s", fn)
+					ss.Errorf("RUNERR: invalid envelope: %s", fn)
 				}
 			} else {
 				env, _ := filepath.Glob(f[0:len(f)-4] + "@*.env")
@@ -141,6 +141,6 @@ func SendMails(spool string, ss *Settings) {
 		}
 		ss.Debugf("SendMails: queued_messages=%v", ecnt)
 	} else {
-		ss.Logf("RUNERR: %v", err)
+		ss.Errorf("RUNERR: %v", err)
 	}
 }
