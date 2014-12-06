@@ -30,8 +30,12 @@ type Settings struct {
 	*log.Logger
 }
 
+func (s *Settings) SetVerbose() {
+  s.Level = log.DebugLevel
+}
+
 func (s Settings) Dump() string {
-	return fmt.Sprintf("SMTP@%s:%d, DBG=%v, CFG=%s", s.Bind, s.Port, s.DebugMode, s.fileName)
+	return fmt.Sprintf("smtp@%s:%d, dbg=%v, cfg=%s", s.Bind, s.Port, s.DebugMode, s.fileName)
 }
 
 func (s *Settings) compileRoutes() {

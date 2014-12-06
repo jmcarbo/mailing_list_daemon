@@ -7,6 +7,7 @@ import (
 	"path"
 	"smtp"
 	"time"
+  "flag"
 )
 
 var (
@@ -15,11 +16,18 @@ var (
 )
 
 func main() {
+  verbose := flag.Bool("v", false, "Log debug messages")
+  flag.Parse()
 	if len(os.Args) < 2 {
 		fmt.Printf("USAGE: %s <config file>\n", path.Base(os.Args[0]))
 		os.Exit(1)
 	}
+
 	environ, err := smtp.LoadSettings(os.Args[1])
+
+  if *verbose {
+    environ.SetVerbose()   
+  }
 	if err != nil {
 		if environ == nil {
 			panic(err)
